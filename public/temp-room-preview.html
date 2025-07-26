@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Room Preview - CloudSync</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .room-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .room-header {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .room-info {
+            margin-bottom: 1rem;
+        }
+
+        .room-name {
+            font-size: 2rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .room-description {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .room-stats {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .room-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #uploadBtn {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        #inviteBtn {
+            background-color: #34a853;
+            color: white;
+        }
+
+        #settingsBtn {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        .room-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .content-header {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 0.75rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .search-bar button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            background-color: #f1f3f4;
+            color: #1a1a1a;
+            cursor: pointer;
+        }
+
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 2rem;
+        }
+
+        .files-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .files-section h2 {
+            margin-bottom: 1.5rem;
+            color: #1a1a1a;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .file-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .file-info {
+            flex: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .file-meta {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .room-sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .members-section,
+        .activity-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .members-section h3,
+        .activity-section h3 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .members-list,
+        .activity-list {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .member-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .member-avatar {
+            width: 32px;
+            height: 32px;
+            background-color: #4285f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 500;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+        }
+
+        .member-role {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .activity-icon {
+            width: 32px;
+            height: 32px;
+            background-color: #f1f3f4;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-text {
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.85rem;
+            color: #666;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="room-container">
+        <header class="room-header">
+            <div class="room-info">
+                <h1 class="room-name">Project Documentation</h1>
+                <p class="room-description">A collaborative space for project documentation and resources</p>
+            </div>
+            <div class="room-stats">
+                <span>5 members</span> | <span>12 files</span> | <span>25.4 MB</span>
+            </div>
+            <div class="room-actions">
+                <button id="uploadBtn" class="action-btn">
+                    <span>📤</span> Upload Files
+                </button>
+                <button id="inviteBtn" class="action-btn">
+                    <span>👥</span> Invite Members
+                </button>
+                <button id="settingsBtn" class="action-btn">
+                    <span>⚙️</span> Settings
+                </button>
+            </div>
+        </header>
+
+        <main class="room-content">
+            <div class="content-header">
+                <div class="search-bar">
+                    <input type="search" placeholder="Search files...">
+                    <button>Sort</button>
+                    <button>Filter</button>
+                </div>
+            </div>
+
+            <div class="content-grid">
+                <section class="files-section">
+                    <h2>Files</h2>
+                    <div class="file-grid">
+                        <!-- Sample Files -->
+                        <div class="file-item">
+                            <div class="file-icon">📄</div>
+                            <div class="file-info">
+                                <div class="file-name">Project Plan.pdf</div>
+                                <div class="file-meta">2.4 MB • 2 hours ago</div>
+                            </div>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">📊</div>
+                            <div class="file-info">
+                                <div class="file-name">Analytics Report.xlsx</div>
+                                <div class="file-meta">1.8 MB • Yesterday</div>
+                            </div>
+                        </div>
+                        <div class="file-item">
+                            <div class="file-icon">🖼️</div>
+                            <div class="file-info">
+                                <div class="file-name">Design Mockup.png</div>
+                                <div class="file-meta">4.2 MB • 2 days ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <aside class="room-sidebar">
+                    <section class="members-section">
+                        <h3>Members</h3>
+                        <div class="members-list">
+                            <!-- Sample Members -->
+                            <div class="member-item">
+                                <div class="member-avatar">JD</div>
+                                <div class="member-info">
+                                    <div class="member-name">John Doe</div>
+                                    <div class="member-role">Owner</div>
+                                </div>
+                            </div>
+                            <div class="member-item">
+                                <div class="member-avatar">AS</div>
+                                <div class="member-info">
+                                    <div class="member-name">Alice Smith</div>
+                                    <div class="member-role">Admin</div>
+                                </div>
+                            </div>
+                            <div class="member-item">
+                                <div class="member-avatar">RJ</div>
+                                <div class="member-info">
+                                    <div class="member-name">Robert Johnson</div>
+                                    <div class="member-role">Member</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <section class="activity-section">
+                        <h3>Recent Activity</h3>
+                        <div class="activity-list">
+                            <!-- Sample Activities -->
+                            <div class="activity-item">
+                                <div class="activity-icon">📤</div>
+                                <div class="activity-content">
+                                    <div class="activity-text">John uploaded Project Plan.pdf</div>
+                                    <div class="activity-time">2 hours ago</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">👥</div>
+                                <div class="activity-content">
+                                    <div class="activity-text">Alice invited Robert Johnson</div>
+                                    <div class="activity-time">Yesterday</div>
+                                </div>
+                            </div>
+                            <div class="activity-item">
+                                <div class="activity-icon">🗑️</div>
+                                <div class="activity-content">
+                                    <div class="activity-text">Robert deleted old-version.doc</div>
+                                    <div class="activity-time">2 days ago</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </aside>
+            </div>
+        </main>
+    </div>
+</body>
+
+</html>

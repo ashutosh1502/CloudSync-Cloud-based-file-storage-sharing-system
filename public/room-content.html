@@ -1,0 +1,77 @@
+<!-- room-content.html -->
+<link rel="stylesheet" href="room-content.css">
+
+<div class="container">
+    <!-- Room Header -->
+    <div class="room-header">
+        <div class="room-title">
+            <div class="room-name">Room Name</div>
+            <div class="room-actions">
+                <button id="uploadBtn" class="btn btn-primary">Upload</button>
+                <button id="settingsBtn" class="btn btn-secondary">Settings</button>
+                <button id="inviteBtn" class="btn btn-secondary">Invite</button>
+                <button id="backBtn" class="btn btn-secondary">Back</button>
+            </div>
+        </div>
+        <div class="room-info">
+            <div class="room-description">Room description here...</div>
+            <div class="room-stats">
+                <div class="stat">
+                    <div class="stat-value" id="memberCount">0</div>
+                    <div class="stat-label">Members</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="fileCount">0</div>
+                    <div class="stat-label">Files</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value" id="totalSize">0 KB</div>
+                    <div class="stat-label">Total Size</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Files Section -->
+        <div class="files-section">
+            <div class="section-header">
+                <div class="section-title">Files</div>
+                <div>
+                    <button id="sortBtn" class="btn btn-secondary">Sort</button>
+                    <button id="filterBtn" class="btn btn-secondary">Filter</button>
+                </div>
+            </div>
+            <div id="fileGrid" class="file-grid"></div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <!-- Members -->
+            <div class="members-section">
+                <h3>Members</h3>
+                <div id="memberList" class="member-list"></div>
+            </div>
+
+            <!-- Activity -->
+            <div class="activity-section">
+                <h3>Activity</h3>
+                <div id="activityList" class="activity-list"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Upload Overlay -->
+<div id="uploadOverlay" class="upload-overlay">
+    <div class="upload-content">
+        <div class="upload-header">
+            <div class="upload-title">Upload Files</div>
+            <button id="closeUploadBtn" class="close-btn">&times;</button>
+        </div>
+        <div id="uploadDropzone" class="upload-dropzone">Click or drop files here</div>
+        <input type="file" id="fileInput" multiple style="display: none;" />
+        <div id="uploadList" class="upload-list"></div>
+    </div>
+</div>

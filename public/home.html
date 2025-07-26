@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloud Storage</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            padding: 2rem;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .profile-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .profile-pic {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: #666;
+            cursor: pointer;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+        }
+
+        .username {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .logout-btn {
+            padding: 0.5rem 1rem;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .logout-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .cloud-icon {
+            width: 48px;
+            height: 48px;
+            background-color: #0066cc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+        }
+
+        .cloud-icon svg {
+            width: 28px;
+            height: 28px;
+            fill: white;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #1a1a1a;
+        }
+
+        .search-bar {
+            width: 100%;
+            padding: 1rem;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+            background-color: white;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .upload-btn,
+        .create-folder-btn,
+        .create-room-btn {
+            flex: 1;
+            padding: 1rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .upload-btn {
+            background-color: #4285f4;
+            color: white;
+        }
+
+        .create-folder-btn {
+            background-color: #34a853;
+            color: white;
+        }
+
+        .create-room-btn {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        .upload-btn:hover {
+            background-color: #3367d6;
+        }
+
+        .create-folder-btn:hover {
+            background-color: #2d8745;
+        }
+
+        .create-room-btn:hover {
+            background-color: #7b1fa2;
+        }
+
+        .folders-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .folders-section h2 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .folders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .folder-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .folder-item:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .folder-icon {
+            font-size: 1.5rem;
+        }
+
+        .folder-name {
+            flex-grow: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .folder-actions {
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .folder-item:hover .folder-actions {
+            opacity: 1;
+        }
+
+        .recent-files {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .recent-files h2 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+            position: relative;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            margin-right: 1rem;
+            background-color: #e0e0e0;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .file-name {
+            flex-grow: 1;
+            font-size: 1rem;
+        }
+
+        .file-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .more-options-btn {
+            border: none;
+            background: none;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0 5px;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+
+        .copy-link-btn {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+        }
+
+        .copy-link-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .more-options {
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+            z-index: 1000;
+            display: none;
+            margin-top: 5px;
+        }
+
+        .dropdown-menu.active {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #333;
+        }
+
+        .dropdown-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .dropdown-item:first-child {
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+        }
+
+        .dropdown-item:last-child {
+            border-bottom-left-radius: 8px;
+            border-bottom-right-radius: 8px;
+        }
+
+        .upload-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .upload-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .upload-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+        }
+
+        .upload-overlay.active .upload-content {
+            transform: translateY(0);
+        }
+
+        .upload-progress {
+            margin: 20px 0;
+            background: #f0f0f0;
+            border-radius: 20px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: #4285f4;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .upload-status {
+            margin-top: 15px;
+            color: #666;
+        }
+
+        .upload-files {
+            margin-top: 20px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .upload-file-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .upload-file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-icon {
+            margin-right: 10px;
+        }
+
+        .file-details {
+            flex-grow: 1;
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .file-size {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .file-status {
+            margin-left: 10px;
+        }
+
+        .success-icon {
+            color: #4CAF50;
+        }
+
+        .error-icon {
+            color: #f44336;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        .download-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .download-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .download-content {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .download-overlay.active .download-content {
+            transform: translateY(0);
+        }
+
+        .download-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            display: inline-block;
+            animation: bounce 1s infinite;
+        }
+
+        .download-progress {
+            margin: 20px 0;
+            background: #f0f0f0;
+            border-radius: 20px;
+            height: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .download-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #4285f4, #34a853);
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .download-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg,
+                    rgba(255, 255, 255, 0.1),
+                    rgba(255, 255, 255, 0.2),
+                    rgba(255, 255, 255, 0.1));
+            animation: shine 1.5s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .download-status {
+            margin-top: 15px;
+            color: #666;
+            font-size: 16px;
+        }
+
+        .download-info {
+            margin-top: 10px;
+            color: #888;
+            font-size: 14px;
+        }
+
+        .success-animation {
+            animation: scaleUp 0.3s ease forwards;
+        }
+
+        @keyframes scaleUp {
+            0% {
+                transform: scale(0);
+            }
+
+            50% {
+                transform: scale(1.2);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        /* Loading animation styles */
+        .loading-container {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .loading-spinner-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .loading-spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #4285f4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Skeleton loading animation */
+        .skeleton-item {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+            border-radius: 8px;
+            height: 60px;
+            margin-bottom: 0.5rem;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Search Results Section */
+        .search-results {
+            display: none;
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-results.active {
+            display: block;
+        }
+
+        .search-results h2 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .clear-search {
+            padding: 0.5rem 1rem;
+            background-color: #f1f3f4;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            color: #1a73e8;
+        }
+
+        .clear-search:hover {
+            background-color: #e8f0fe;
+        }
+
+        .search-category {
+            margin-bottom: 1.5rem;
+        }
+
+        .search-category h3 {
+            font-size: 1.1rem;
+            color: #666;
+            margin-bottom: 0.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+
+        /* Room Styles */
+        .rooms-section {
+            background-color: white;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .rooms-section h2 {
+            margin-bottom: 1rem;
+            color: #1a1a1a;
+        }
+
+        .rooms-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .room-item {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .room-item:hover {
+            background-color: #e9ecef;
+            transform: translateY(-2px);
+        }
+
+        .room-header {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .room-icon {
+            font-size: 1.5rem;
+        }
+
+        .room-name {
+            font-weight: 500;
+            color: #333;
+        }
+
+        .room-description {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .room-members {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .member-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background-color: #4285f4;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+        }
+
+        .create-room-btn {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        .create-room-btn:hover {
+            background-color: #7b1fa2;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 2rem;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .modal-content h2 {
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .modal-content .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .modal-content label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+
+        .modal-content input,
+        .modal-content textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .modal-content textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .cancel-btn {
+            background-color: #f1f3f4;
+            color: #333;
+        }
+
+        .create-btn {
+            background-color: #9c27b0;
+            color: white;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e8eaed;
+        }
+
+        .create-btn:hover {
+            background-color: #7b1fa2;
+        }
+
+        /* Room Settings Modal Styles */
+        .room-settings-modal .modal-content {
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #666;
+            padding: 0.5rem;
+            transition: color 0.2s;
+        }
+
+        .close-btn:hover {
+            color: #333;
+        }
+
+        .settings-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+            padding: 1rem 0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            color: #666;
+            font-size: 1rem;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: #333;
+        }
+
+        .tab-btn.active {
+            color: #1a73e8;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1rem;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background-color: #1a73e8;
+            animation: slideIn 0.3s ease;
+        }
+
+        .tab-content {
+            position: relative;
+            min-height: 300px;
+        }
+
+        .tab-pane {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-pane.active {
+            display: block;
+        }
+
+        .members-list {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .member-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-bottom: 1px solid #eee;
+            animation: slideIn 0.3s ease;
+        }
+
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .member-details {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .member-email {
+            font-weight: 500;
+        }
+
+        .member-role {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .member-actions {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .role-select {
+            padding: 0.25rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .remove-member-btn {
+            background: none;
+            border: none;
+            color: #f44336;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .remove-member-btn:hover {
+            background-color: #ffebee;
+        }
+
+        .remove-member-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .invite-section {
+            padding: 1rem;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+
+        .invite-section h3 {
+            margin-bottom: 1rem;
+        }
+
+        .invite-section .form-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        #inviteEmail {
+            flex: 1;
+        }
+
+        #inviteRole {
+            width: 120px;
+        }
+
+        #sendInviteBtn {
+            padding: 0.5rem 1rem;
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        #sendInviteBtn:hover {
+            background-color: #1557b0;
+        }
+
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .activity-item {
+            display: flex;
+            gap: 1rem;
+            padding: 0.75rem;
+            border-bottom: 1px solid #eee;
+            animation: slideIn 0.3s ease;
+        }
+
+        .activity-icon {
+            font-size: 1.2rem;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-description {
+            margin-bottom: 0.25rem;
+        }
+
+        .activity-time {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+        }
+
+        .delete-room-btn {
+            background-color: #f44336;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .delete-room-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .save-settings-btn {
+            background-color: #1a73e8;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .save-settings-btn:hover {
+            background-color: #1557b0;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 1rem 2rem;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.9rem;
+            z-index: 1000;
+            animation: slideUp 0.3s ease;
+        }
+
+        .toast.success {
+            background-color: #4caf50;
+        }
+
+        .toast.error {
+            background-color: #f44336;
+        }
+
+        /* Room Settings Button */
+        .room-settings-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            transition: background-color 0.2s;
+            opacity: 0;
+        }
+
+        .room-item:hover .room-settings-btn {
+            opacity: 1;
+        }
+
+        .room-settings-btn:hover {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Loading States */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .room-settings-modal .modal-content {
+                width: 95%;
+                margin: 10px;
+            }
+
+            .settings-tabs {
+                flex-wrap: wrap;
+            }
+
+            .member-item {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .member-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+
+            .invite-section .form-group {
+                flex-direction: column;
+            }
+
+            #inviteRole {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <div class="cloud-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path
+                            d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96z" />
+                    </svg>
+                </div>
+                <h1>CloudSync</h1>
+            </div>
+            <div class="profile-section">
+                <div class="user-info">
+                    <span class="username" id="username">Loading...</span>
+                </div>
+                <div class="profile-pic" id="profilePic">👤</div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+        </div>
+
+        <input type="search" class="search-bar" placeholder="Search files and folders...">
+
+        <div class="action-buttons">
+            <button class="upload-btn">Upload Files</button>
+            <button class="create-folder-btn">Create Folder</button>
+            <button class="create-room-btn">Create Room</button>
+        </div>
+
+        <!-- Rooms Section -->
+        <div class="rooms-section">
+            <h2>Collaborative Rooms</h2>
+            <div class="rooms-grid" id="roomsContainer">
+                <!-- Rooms will be dynamically added here -->
+            </div>
+        </div>
+
+        <!-- Room Creation Modal -->
+        <div class="modal" id="roomModal">
+            <div class="modal-content">
+                <h2>Create New Room</h2>
+                <form id="createRoomForm">
+                    <div class="form-group">
+                        <label for="roomName">Room Name</label>
+                        <input type="text" id="roomName" required placeholder="Enter room name">
+                    </div>
+                    <div class="form-group">
+                        <label for="roomDescription">Description (optional)</label>
+                        <textarea id="roomDescription" placeholder="Enter room description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="inviteEmails">Invite Users (Enter email addresses)</label>
+                        <textarea id="inviteEmails" placeholder="Enter email addresses, separated by commas"></textarea>
+                    </div>
+                    <div class="modal-buttons">
+                        <button type="button" class="cancel-btn" onclick="closeRoomModal()">Cancel</button>
+                        <button type="submit" class="create-btn">Create Room</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Search Results Section -->
+        <div class="search-results">
+            <h2>
+                Search Results
+                <button class="clear-search">Clear Search</button>
+            </h2>
+            <div class="search-content">
+                <!-- Search results will be dynamically added here -->
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="folders-section">
+                <h2>Folders</h2>
+                <div class="folders-grid">
+                    <!-- Folders will be dynamically added here -->
+                </div>
+            </div>
+
+            <div class="recent-files">
+                <h2>Recent Files</h2>
+                <!-- Files will be dynamically added here -->
+            </div>
+        </div>
+    </div>
+    <script>
+        window.AWS = {};
+    </script>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1001.0.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script type="module" src="home.js"></script>
+</body>
+
+</html>
